@@ -4,13 +4,10 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
-import java.util.Set;
-
 import org.jgrapht.Graph;
 import org.jgrapht.Graphs;
 import org.jgrapht.graph.DefaultWeightedEdge;
@@ -28,7 +25,6 @@ public class Simulator {
 	private Graph <Nerc, DefaultWeightedEdge> graph;
 	private Map<Nerc, List<Nerc>> mappaCrediti;
 	//Un set che serve a tener conto dei Nerc che aiutano e che non sono liberi
-	private Set<Nerc> disponibili;
 	private Map<Nerc, BonusAiuto> aiutante;
 	
 	public void init(int k, Graph<Nerc, DefaultWeightedEdge> graph, PriorityQueue<Event> queue) {
@@ -41,10 +37,7 @@ public class Simulator {
 		this.statistiche = new Stats(new ArrayList<Nerc>(graph.vertexSet()));
 		this.graph = graph;
 		this.mappaCrediti = new HashMap<Nerc, List<Nerc>>();
-		
-		//tutti disponibili all'inizio
-		this.disponibili = new HashSet<>(graph.vertexSet());
-		
+				
 		//inizialmente vuota
 		this.aiutante = new HashMap<Nerc, BonusAiuto>();
 		
@@ -75,7 +68,8 @@ public class Simulator {
 			
 				//il Nerc in difficolta non può aiutare nessuno
 		
-		    disponibili.remove(nerc);
+		   
+		    nerc.setDisponibile(false);
 		
 			List<Nerc> debitori = mappaCrediti.get(nerc);
 			
@@ -87,7 +81,7 @@ public class Simulator {
 			
 			for(Nerc disp : debitori) {
 				
-				if(disponibili.contains(disp))
+				if(disp.isDisponibile())
 					debDisp.add(disp);
 				
 			}
@@ -100,7 +94,7 @@ public class Simulator {
 				Nerc aiuta = debDisp.get(0);
 				
 				//non è più disponibile
-				disponibili.remove(aiuta);
+				aiuta.setDisponibile(false);
 				
 				//mappo la relazione   classe che tiene conto della data
 				aiutante.put(nerc, new BonusAiuto(aiuta,nerc,ev.getData()));
@@ -114,7 +108,7 @@ public class Simulator {
 					
 			         Nerc best = getAiutanteMigliore(nerc, debDisp);
 		        	//non è più disponibile
-		        	disponibili.remove(best);
+		        	best.setDisponibile(false);
 			
 	        		//mappo la relazione   classe che tiene conto della data
 		         	aiutante.put(nerc, new BonusAiuto(best,nerc,ev.getData()));
@@ -131,14 +125,14 @@ public class Simulator {
 			List<Nerc> viciniDisp = new ArrayList<>();
 			
 			for(Nerc n : vicini) {
-				if(disponibili.contains(n))
+				if(n.isDisponibile())
 					viciniDisp.add(n);
 			}
 			
 			if(!viciniDisp.isEmpty()) {
 			
 				Nerc best =  getAiutanteMigliore(nerc, viciniDisp);
-				disponibili.remove(best);
+				best.setDisponibile(false);
 				
         		//mappo la relazione   classe che tiene conto della data
 	         	aiutante.put(nerc, new BonusAiuto(best,nerc,ev.getData()));
@@ -160,8 +154,8 @@ public class Simulator {
 			// potrebbe esserci stata una catastrofe
 				if(ba!=null) {
 				
-				disponibili.add(nerc);
-				disponibili.add(ba.getDebitore());
+				nerc.setDisponibile(true);
+				ba.getDebitore().setDisponibile(true);
 				
 			
 				
