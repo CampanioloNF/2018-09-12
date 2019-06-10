@@ -5,9 +5,12 @@
 package it.polito.tdp.poweroutages;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import it.polito.tdp.poweroutages.model.Model;
+import it.polito.tdp.poweroutages.model.Nerc;
+import it.polito.tdp.poweroutages.model.NercWeight;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -32,7 +35,7 @@ public class PowerOutagesController {
     private Button btnCreaGrafo; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbBoxNerc"
-    private ComboBox<?> cmbBoxNerc; // Value injected by FXMLLoader
+    private ComboBox<Nerc> cmbBoxNerc; // Value injected by FXMLLoader
 
     @FXML // fx:id="btnVisualizzaVicini"
     private Button btnVisualizzaVicini; // Value injected by FXMLLoader
@@ -46,16 +49,52 @@ public class PowerOutagesController {
     @FXML
     void doCreaGrafo(ActionEvent event) {
 
+    	model.creaGrafo();
+    	cmbBoxNerc.getItems().addAll(model.getNercs());
+    	
     }
 
     @FXML
     void doSimula(ActionEvent event) {
 
+    	String input = txtK.getText();
+    	
+    	if(input!=null) {
+    		
+    		try {
+    			
+    			model.simula(Integer.parseInt(input));
+    			txtResult.appendText(model.getStats().toString());
+    			
+    			
+    		}catch(NumberFormatException nfe) {
+    			txtResult.appendText("Si prega di inserire un numero intero K");
+    			return;
+    		}
+    		
+    		
+    	}else
+    		txtResult.appendText("Si prega di inserire un numero intero K");
+    	
     }
 
     @FXML
     void doVisualizzaVicini(ActionEvent event) {
 
+    	txtResult.clear();
+    	
+    	Nerc nerc = cmbBoxNerc.getValue();
+    	
+    	if(nerc!=null) {
+    		
+    		List<NercWeight> vicini = model.getVicini(nerc);
+    		
+    		for(NercWeight n : vicini) 
+    			txtResult.appendText(n.getNerc()+"  ("+n.getPeso()+")\n");
+    		
+    		
+    	}else 
+    	  txtResult.appendText("Errore selezionare un Nerc dal menù a tendina");
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
