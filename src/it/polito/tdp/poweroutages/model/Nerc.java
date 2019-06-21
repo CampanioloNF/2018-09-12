@@ -3,12 +3,11 @@ package it.polito.tdp.poweroutages.model;
 public class Nerc {
 	private int id;
 	private String value;
-	private boolean disponibile;
-
+	
 	public Nerc(int id, String value) {
 		this.id = id;
 		this.value = value;
-		this.disponibile = true;
+		
 	}
 
 	public int getId() {
@@ -25,14 +24,6 @@ public class Nerc {
 
 	public void setValue(String value) {
 		this.value = value;
-	}
-
-	public boolean isDisponibile() {
-		return disponibile;
-	}
-
-	public void setDisponibile(boolean disponibile) {
-		this.disponibile = disponibile;
 	}
 
 	@Override

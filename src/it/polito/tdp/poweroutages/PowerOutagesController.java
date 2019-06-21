@@ -57,6 +57,8 @@ public class PowerOutagesController {
     @FXML
     void doSimula(ActionEvent event) {
 
+    	txtResult.clear();
+    	
     	String input = txtK.getText();
     	
     	if(input!=null) {
